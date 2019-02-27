@@ -25,12 +25,12 @@ WriteMakefile(
         'meta-spec' => { version => 2 },
         resources   => {
             bugtracker => {
-                web => 'https://github.com/dallaylaen/on-demand/issues',
+                web => 'https://github.com/dallaylaen/on-demand-perl/issues',
             },
             repository => {
                 type => 'git',
-                url => 'https://github.com/dallaylaen/on-demand.git',
-                web => 'https://github.com/dallaylaen/on-demand',
+                url => 'https://github.com/dallaylaen/on-demand-perl.git',
+                web => 'https://github.com/dallaylaen/on-demand-perl',
             },
         },
         x_contributors => [

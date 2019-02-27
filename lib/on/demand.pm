@@ -113,7 +113,7 @@ Please report bugs via github or RT:
 
 =over
 
-=item * L<https://github.com/dallaylaen/on-demand/issues>
+=item * L<https://github.com/dallaylaen/on-demand-perl/issues>
 
 =item * C<bug-assert-refute-t-deep at rt.cpan.org>
 
@@ -131,7 +131,7 @@ You can also look for information at:
 
 =over 4
 
-=item * github: L<https://github.com/dallaylaen/on-demand>
+=item * github: L<https://github.com/dallaylaen/on-demand-perl>
 
 =item * RT: CPAN's request tracker (report bugs here)
 

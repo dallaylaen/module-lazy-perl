@@ -37,7 +37,7 @@ perldoc command.
 You can also look for information at:
 
     Github:
-        https://github.com/dallaylaen/on-demand
+        https://github.com/dallaylaen/on-demand-perl
 
     RT, CPAN's request tracker (report bugs here)
         http://rt.cpan.org/NoAuth/Bugs.html?Dist=on-demand
