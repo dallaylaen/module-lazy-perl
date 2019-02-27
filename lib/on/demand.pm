@@ -63,6 +63,18 @@ sub import {
     _set_function( $target, DESTROY  => sub {} );
 };
 
+sub unimport {
+    my $class = shift;
+
+    croak "usage: no on::demand;"
+        if @_;
+
+    # sort keys to ensure load order stability in case of bugs
+    foreach (sort keys %seen) {
+        _load($_);
+    };
+};
+
 sub _load {
     my $target = shift;
 
