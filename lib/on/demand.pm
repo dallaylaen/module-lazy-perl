@@ -7,23 +7,89 @@ our $VERSION = '0.01';
 
 =head1 NAME
 
-on::demand - A brand new module
+on::demand - postpone loading modules until actually used
 
 =head1 SYNOPSIS
 
-Provide an example here:
+    use on::demand "My::Module";
+    # My::Module has not been loaded
 
-    use on::demand;
-    my $foo = on::demand->new;
-    # ...
+    my $var = My::Module->new;
+    # My::Module is loaded now, and new() method is called
 
 =head1 EXPORT
 
-=head1 METHODS
+None.
 
 =cut
 
 use Carp;
+
+my %seen;
+sub import {
+    my ($class, $target, @rest) = @_;
+
+    croak "Usage: use on::demand 'Module::Name';"
+        unless defined $target and @rest == 0;
+
+    # return ASAP if already loaded by us or Perl itself
+    return if $seen{$target};
+    my $mod = $target;
+    $mod =~ s,::,/,g;
+    $mod .= ".pm";
+    return if $INC{$mod};
+
+    croak "Bad module name '$target'"
+        unless $target =~ /^[A-Za-z_][A-Za-z_0-9]*(?:::[A-Za-z_0-9]+)*$/;
+
+    $seen{$target} = $mod;
+
+    # Future autoload
+    our $AUTOLOAD;
+    my $auto = sub {
+        _load( $target );
+
+        my $todo = $AUTOLOAD;
+        $todo =~ s/.*:://;
+        my $jump = $target->can($todo);
+
+        croak qq{Can't locate object method "$todo" via package "$target"}
+            unless $jump;
+
+        goto &$jump;
+    };
+
+    _set_function( $target, AUTOLOAD => $auto );
+    _set_function( $target, DESTROY  => sub {} );
+};
+
+sub _load {
+    my $target = shift;
+
+    my $mod = delete $seen{$target};
+    croak "Module '$target' was never loaded via on::demand, that's possibly a bug"
+        unless $mod;
+
+    # reset added methods prior to loading
+    _set_function( $target, AUTOLOAD => undef );
+    _set_function( $target, DESTROY  => undef );
+
+    local $Carp::Internal{ __PACKAGE__ } = 1;
+    require $mod;
+    $target->import();
+};
+
+sub _set_function {
+    my ($target, $name, $code) = @_;
+
+    if (ref $code) {
+        no strict 'refs'; ## no critic
+        *{ $target."::".$name } = $code;
+    } else {
+        no strict 'refs'; ## no critic
+        delete ${ $target."::" }{ $name };
+    };
+};
 
 =head1 AUTHOR
 
