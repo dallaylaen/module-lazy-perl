@@ -7,7 +7,7 @@ our $VERSION = '0.01';
 
 =head1 NAME
 
-on::demand - postpone loading modules until actually used
+on::demand - postpone loading a module until it's actually used
 
 =head1 SYNOPSIS
 
@@ -16,6 +16,9 @@ on::demand - postpone loading modules until actually used
 
     my $var = My::Module->new;
     # My::Module is loaded now, and new() method is called
+
+    no on::demand;
+    # Force loading of all postponed modules
 
 =head1 EXPORT
 
@@ -150,6 +153,11 @@ L<http://cpanratings.perl.org/d/on-demand>
 L<http://metacpan.org/pod/on::demand/>
 
 =back
+
+=head1 SEE ALSO
+
+L<autouse> is another module with similar idea, however,
+it does it for imported functions rather than methods.
 
 =head1 ACKNOWLEDGEMENTS
 
