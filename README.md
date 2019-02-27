@@ -2,11 +2,26 @@ on-demand
 
 # NAME
 
-on::demand - Brand new module
+on::demand - postpone loading a perl module until it's actually used
+
+# USAGE
+
+    use on::demand "My::Module";
+    # the module is not required at this point, speeding up the startup
+
+    my $new = My::Module->new;
+    # My::Module is loaded now and real new() method is called
+
+    no on::demand;
+    # Force loading of all postponed modules, in alphabetical order
 
 # DESCRIPTION
 
-# USAGE
+In a big project with large dependency footprint
+loading modules may take quite a while.
+This is not a problem for daemons or long-running apps.
+However, time saving for simple command-line tools or test scripts
+may be significant.
 
 # CONTENTS OF THIS PACKAGE
 
