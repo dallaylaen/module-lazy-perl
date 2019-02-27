@@ -2,10 +2,10 @@
 
 use strict;
 use warnings;
+use Test::More tests => 4;
+
 use File::Basename qw(dirname);
 use lib dirname(__FILE__)."/lib"; # t/lib
-
-use Test::More tests => 4;
 
 require on::demand;
 
