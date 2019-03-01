@@ -71,11 +71,6 @@ sub import {
         my $jump = _jump( $target, $AUTOLOAD );
         goto $jump;
     } );
-    _set_function( $target, DESTROY  => sub {
-        _load( $target );
-        my $jump = _jump( $target, "DESTROY", "nodie" );
-        goto $jump if $jump;
-    } );
 };
 
 =head2 unimport
