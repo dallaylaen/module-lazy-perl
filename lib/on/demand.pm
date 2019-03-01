@@ -39,6 +39,9 @@ A stub package with the same name is created instead.
 Should any method call be performed on the stub package,
 it loads the original one and jumps to respective method.
 
+In particular, C<can()> and C<isa()> are overloaded
+and will trigger module loading.
+
 Upon loading, C<import> is not called on the target package.
 This MAY change in the future.
 
@@ -71,6 +74,15 @@ sub import {
         my $jump = _jump( $target, $AUTOLOAD );
         goto $jump;
     } );
+
+    foreach (qw( can isa )) {
+        my $name = $_; # separate variable to close over
+        _set_function( $target, $name => sub {
+            _load( $target );
+            my $jump = _jump( $target, $name );
+            goto $jump;
+        });
+    };
 };
 
 =head2 unimport
@@ -98,6 +110,7 @@ sub unimport {
     };
 };
 
+my %known_method;
 sub _load {
     my $target = shift;
 
@@ -105,9 +118,10 @@ sub _load {
     croak "Module '$target' was never loaded via on::demand, that's possibly a bug"
         unless $mod;
 
-    # reset added methods prior to loading
-    _set_function( $target, AUTOLOAD => undef );
-    _set_function( $target, DESTROY  => undef );
+    # reset stub methods prior to loading
+    foreach (keys %{ $known_method{$target} || {} }) {
+        _set_function( $target, $_ => undef );
+    };
 
     package
         on::demand::_::quarantine;
@@ -133,6 +147,7 @@ sub _set_function {
     my ($target, $name, $code) = @_;
 
     if (ref $code) {
+        $known_method{$target}{$name}++;
         no strict 'refs'; ## no critic
         *{ $target."::".$name } = $code;
     } else {
