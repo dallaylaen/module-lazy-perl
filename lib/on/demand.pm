@@ -47,23 +47,17 @@ sub import {
 
     $seen{$target} = $mod;
 
-    # Future autoload
     our $AUTOLOAD;
-    my $auto = sub {
+    _set_function( $target, AUTOLOAD => sub {
         _load( $target );
-
-        my $todo = $AUTOLOAD;
-        $todo =~ s/.*:://;
-        my $jump = $target->can($todo);
-
-        croak qq{Can't locate object method "$todo" via package "$target"}
-            unless $jump;
-
-        goto &$jump;
-    };
-
-    _set_function( $target, AUTOLOAD => $auto );
-    _set_function( $target, DESTROY  => sub {} );
+        my $jump = _jump( $target, $AUTOLOAD );
+        goto $jump;
+    } );
+    _set_function( $target, DESTROY  => sub {
+        _load( $target );
+        my $jump = _jump( $target, "DESTROY", "nodie" );
+        goto $jump if $jump;
+    } );
 };
 
 sub unimport {
@@ -92,6 +86,18 @@ sub _load {
     local $Carp::Internal{ __PACKAGE__ } = 1;
     require $mod;
     $target->import();
+};
+
+sub _jump {
+    my ($target, $todo, $nodie) = @_;
+
+    $todo =~ s/.*:://;
+    my $jump = $target->can($todo);
+
+    croak qq{Can't locate object method "$todo" via package "$target"}
+        unless $jump or $nodie;
+
+    return $jump;
 };
 
 sub _set_function {
