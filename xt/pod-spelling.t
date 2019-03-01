@@ -13,7 +13,7 @@ BEGIN {
         spelling => {
             allow_words => [qw[
                 Konstantin S. Uvarin
-                github metacpan annocpan CPAN RT
+                github metacpan annocpan CPAN RT unimport
                 TBD
             ]],
         }

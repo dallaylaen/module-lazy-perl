@@ -20,13 +20,31 @@ on::demand - postpone loading a module until it's actually used
     no on::demand;
     # Force loading of all postponed modules
 
-=head1 EXPORT
+=head1 EXPORTED FUNCTIONS
 
 None.
+
+=head1 METHODS
 
 =cut
 
 use Carp;
+
+=head2 import
+
+When C<use on::demand "Some::Module";> is called,
+the module in question is not loaded.
+A stub package with the same name is created instead.
+
+Should any method call be performed on the stub package,
+it loads the original one and jumps to respective method.
+
+Upon loading, C<import> is not called on the target package.
+This MAY change in the future.
+
+No extra options (except from target module name) are allowed.
+
+=cut
 
 my %seen;
 sub import {
@@ -60,6 +78,19 @@ sub import {
     } );
 };
 
+=head2 unimport
+
+Calling C<no on::demand;> or, alternatively, C<on::demand-E<gt>unimport;>
+will cause all postponed modules to be loaded immediately,
+in alphabetical order.
+
+This may be useful to avoid deferred errors and/or side effects
+of module loading.
+
+No extra options to unimport are supported.
+
+=cut
+
 sub unimport {
     my $class = shift;
 
@@ -83,9 +114,12 @@ sub _load {
     _set_function( $target, AUTOLOAD => undef );
     _set_function( $target, DESTROY  => undef );
 
+    package
+        on::demand::_::quarantine;
+
     local $Carp::Internal{ __PACKAGE__ } = 1;
     require $mod;
-    $target->import();
+    # TODO maybe import()
 };
 
 sub _jump {
