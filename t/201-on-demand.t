@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 5;
 
 use File::Basename qw(dirname);
 use lib dirname(__FILE__)."/lib"; # t/lib
@@ -10,8 +10,10 @@ use lib dirname(__FILE__)."/lib"; # t/lib
 require on::demand;
 
 on::demand->import( "on::demand::_::test::sample" );
-
 is $on::demand::_::test::sample::VERSION, undef, "not loaded yet";
+
+on::demand->import( "on::demand::_::test::sample" );
+is $on::demand::_::test::sample::VERSION, undef, "not loaded second time";
 
 my $new = eval {
     on::demand::_::test::sample->new;
