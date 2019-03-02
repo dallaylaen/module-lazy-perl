@@ -63,6 +63,8 @@ No extra options (except from target module name) are allowed.
 =cut
 
 my %seen;
+my $inc_stub = "pending load by ".__PACKAGE__;
+
 sub import {
     my ($class, $target, @rest) = @_;
 
@@ -80,6 +82,11 @@ sub import {
         unless $target =~ /^[A-Za-z_][A-Za-z_0-9]*(?:::[A-Za-z_0-9]+)*$/;
 
     $seen{$target} = $mod;
+
+    # If $target is later require'd directly,
+    # autoload and destroy will be overwritten and will cause a warning.
+    # Preventing them from being loaded seems like a lesser evil.
+    $INC{$mod} = $inc_stub;
 
     _set_function( $target, AUTOLOAD => sub {
         our $AUTOLOAD;
@@ -126,14 +133,21 @@ my %known_method;
 sub _load {
     my $target = shift;
 
+    # TODO distinguish between "not seen" and "already loaded"
     my $mod = delete $seen{$target};
     croak "Module '$target' was never loaded via Module::Lazy, that's possibly a bug"
         unless $mod;
+
+    croak "Module '$target' already loaded from '$INC{$mod}'"
+        unless $INC{$mod} and $INC{$mod} eq $inc_stub;
 
     # reset stub methods prior to loading
     foreach (keys %{ $known_method{$target} || {} }) {
         _set_function( $target, $_ => undef );
     };
+
+    # make the module loadable again
+    delete $INC{$mod};
 
     package
         Module::Lazy::_::quarantine;
