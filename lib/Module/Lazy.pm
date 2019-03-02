@@ -88,6 +88,10 @@ sub import {
         goto $jump;
     } );
 
+    # Provide DESTROY just in case someone blesses an object directly
+    #     without ever loading a module
+    _set_function( $target, DESTROY => _jump( $target, DESTROY => "no_die" ) );
+
     foreach (qw( can isa )) {
         _set_function( $target, $_ => _jump( $target, $_ ) );
     };
