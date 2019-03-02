@@ -180,7 +180,7 @@ Konstantin S. Uvarin, C<< <khedin@cpan.org> >>
 =item * import() is not called on the modules being loaded.
 The decision is yet to be made whether it's good or bad.
 
-=item * C<on Module::Lazy> should prevent further demand loading.
+=item * C<no Module::Lazy> should prevent further demand-loading.
 
 =item * no way to preload prototyped exported functions
 (that's what L<autouse> does),
