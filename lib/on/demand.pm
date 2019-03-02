@@ -20,6 +20,19 @@ on::demand - postpone loading a module until it's actually used
     no on::demand;
     # Force loading of all postponed modules
 
+=head1 DESCRIPTION
+
+In large projects loading all the dependencies may take a lot of time.
+This module attempts to reduce the startup time by postponing initialization.
+The improvement be significant for unit test scripts
+and small command-line tools
+which do not utilize all the functionality at once.
+
+This comes at a cost of reduced stability,
+as load-time errors are also postponed.
+The C<no on::demand> directive is provided to mitigate the risk
+by forcing the pending modules to load.
+
 =head1 EXPORTED FUNCTIONS
 
 None.
@@ -161,6 +174,21 @@ sub _set_function {
 Konstantin S. Uvarin, C<< <khedin@cpan.org> >>
 
 =head1 BUGS
+
+=over
+
+=item * import() is not called on the modules being loaded.
+The decision is yet to be made whether it's good or bad.
+
+=item * C<on on::demand> should prevent further demand loading.
+
+=item * no way to preload prototyped exported functions
+(that's what L<autouse> does),
+but maybe there should be?
+
+=item * certainly not enough interoperability tests (C<use mro 'c3'>?).
+
+=back
 
 Please report bugs via github or RT:
 
