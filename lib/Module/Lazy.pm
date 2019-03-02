@@ -81,20 +81,15 @@ sub import {
 
     $seen{$target} = $mod;
 
-    our $AUTOLOAD;
     _set_function( $target, AUTOLOAD => sub {
-        _load( $target );
+        our $AUTOLOAD;
+        $AUTOLOAD =~ s/.*:://;
         my $jump = _jump( $target, $AUTOLOAD );
         goto $jump;
     } );
 
     foreach (qw( can isa )) {
-        my $name = $_; # separate variable to close over
-        _set_function( $target, $name => sub {
-            _load( $target );
-            my $jump = _jump( $target, $name );
-            goto $jump;
-        });
+        _set_function( $target, $_ => _jump( $target, $_ ) );
     };
 };
 
@@ -147,13 +142,16 @@ sub _load {
 sub _jump {
     my ($target, $todo, $nodie) = @_;
 
-    $todo =~ s/.*:://;
-    my $jump = $target->can($todo);
+    return sub {
+        _load( $target );
 
-    croak qq{Can't locate object method "$todo" via package "$target"}
-        unless $jump or $nodie;
+        my $jump = $target->can($todo);
+        goto $jump
+            if $jump; # TODO should also check it's a CODEREF
 
-    return $jump;
+        croak qq{Can't locate object method "$todo" via package "$target"}
+            unless $nodie;
+    };
 };
 
 sub _set_function {
