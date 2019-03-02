@@ -1,4 +1,4 @@
-package on::demand;
+package Module::Lazy;
 
 use 5.008;
 use strict;
@@ -7,17 +7,17 @@ our $VERSION = '0.01';
 
 =head1 NAME
 
-on::demand - postpone loading a module until it's actually used
+Module::Lazy - postpone loading a module until it's actually used
 
 =head1 SYNOPSIS
 
-    use on::demand "My::Module";
+    use Module::Lazy "My::Module";
     # My::Module has not been loaded
 
     my $var = My::Module->new;
     # My::Module is loaded now, and new() method is called
 
-    no on::demand;
+    no Module::Lazy;
     # Force loading of all postponed modules
 
 =head1 DESCRIPTION
@@ -30,7 +30,7 @@ which do not utilize all the functionality at once.
 
 This comes at a cost of reduced stability,
 as load-time errors are also postponed.
-The C<no on::demand> directive is provided to mitigate the risk
+The C<no Module::Lazy> directive is provided to mitigate the risk
 by forcing the pending modules to load.
 
 =head1 EXPORTED FUNCTIONS
@@ -45,7 +45,7 @@ use Carp;
 
 =head2 import
 
-When C<use on::demand "Some::Module";> is called,
+When C<use Module::Lazy "Some::Module";> is called,
 the module in question is not loaded.
 A stub package with the same name is created instead.
 
@@ -66,7 +66,7 @@ my %seen;
 sub import {
     my ($class, $target, @rest) = @_;
 
-    croak "Usage: use on::demand 'Module::Name';"
+    croak "Usage: use Module::Lazy 'Module::Name';"
         unless defined $target and @rest == 0;
 
     # return ASAP if already loaded by us or Perl itself
@@ -100,7 +100,7 @@ sub import {
 
 =head2 unimport
 
-Calling C<no on::demand;> or, alternatively, C<on::demand-E<gt>unimport;>
+Calling C<no Module::Lazy;> or, alternatively, C<Module::Lazy-E<gt>unimport;>
 will cause all postponed modules to be loaded immediately,
 in alphabetical order.
 
@@ -114,7 +114,7 @@ No extra options to unimport are supported.
 sub unimport {
     my $class = shift;
 
-    croak "usage: no on::demand;"
+    croak "usage: no Module::Lazy;"
         if @_;
 
     # sort keys to ensure load order stability in case of bugs
@@ -128,7 +128,7 @@ sub _load {
     my $target = shift;
 
     my $mod = delete $seen{$target};
-    croak "Module '$target' was never loaded via on::demand, that's possibly a bug"
+    croak "Module '$target' was never loaded via Module::Lazy, that's possibly a bug"
         unless $mod;
 
     # reset stub methods prior to loading
@@ -137,7 +137,7 @@ sub _load {
     };
 
     package
-        on::demand::_::quarantine;
+        Module::Lazy::_::quarantine;
 
     local $Carp::Internal{ __PACKAGE__ } = 1;
     require $mod;
@@ -180,7 +180,7 @@ Konstantin S. Uvarin, C<< <khedin@cpan.org> >>
 =item * import() is not called on the modules being loaded.
 The decision is yet to be made whether it's good or bad.
 
-=item * C<on on::demand> should prevent further demand loading.
+=item * C<on Module::Lazy> should prevent further demand loading.
 
 =item * no way to preload prototyped exported functions
 (that's what L<autouse> does),
@@ -194,11 +194,11 @@ Please report bugs via github or RT:
 
 =over
 
-=item * L<https://github.com/dallaylaen/on-demand-perl/issues>
+=item * L<https://github.com/dallaylaen/module-lazy-perl/issues>
 
 =item * C<bug-assert-refute-t-deep at rt.cpan.org>
 
-=item * L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=on-demand>
+=item * L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Module-Lazy>
 
 =back
 
@@ -206,29 +206,29 @@ Please report bugs via github or RT:
 
 You can find documentation for this module with the C<perldoc> command.
 
-    perldoc on::demand
+    perldoc Module::Lazy
 
 You can also look for information at:
 
 =over 4
 
-=item * github: L<https://github.com/dallaylaen/on-demand-perl>
+=item * github: L<https://github.com/dallaylaen/module-lazy-perl>
 
 =item * RT: CPAN's request tracker (report bugs here)
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=on-demand>
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Module-Lazy>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
-L<http://annocpan.org/dist/on-demand>
+L<http://annocpan.org/dist/Module-Lazy>
 
 =item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/on-demand>
+L<http://cpanratings.perl.org/d/Module-Lazy>
 
 =item * Search CPAN
 
-L<http://metacpan.org/pod/on::demand/>
+L<http://metacpan.org/pod/Module::Lazy/>
 
 =back
 
@@ -281,4 +281,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of on::demand
+1; # End of Module::Lazy

@@ -7,14 +7,14 @@ use File::Basename qw(dirname);
 
 @INC = grep { !m{\bt/lib$} } @INC;
 
-ok_missing( "on::demand::_::test::sample" );
-ok_missing( "on::demand::_::test::sample::missing" );
+ok_missing( "Module::Lazy::_::test::sample" );
+ok_missing( "Module::Lazy::_::test::sample::missing" );
 
 push @INC, dirname(__FILE__)."/lib";
 
-ok_missing( "on::demand::_::test::sample::missing" );
-require_ok( "on::demand::_::test::sample" )
-    or print "Bail out! on::demand::_::test::sample not present in on::demand test kit\n";
+ok_missing( "Module::Lazy::_::test::sample::missing" );
+require_ok( "Module::Lazy::_::test::sample" )
+    or print "Bail out! Module::Lazy::_::test::sample not present in Module::Lazy test kit\n";
 
 sub ok_missing {
     my $module = shift;

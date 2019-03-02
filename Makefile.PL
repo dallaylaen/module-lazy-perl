@@ -4,10 +4,10 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    NAME             => 'on::demand',
+    NAME             => 'Module::Lazy',
     AUTHOR           => q{Konstantin S. Uvarin <khedin@cpan.org>},
-    VERSION_FROM     => 'lib/on/demand.pm',
-    ABSTRACT_FROM    => 'lib/on/demand.pm',
+    VERSION_FROM     => 'lib/Module/Lazy.pm',
+    ABSTRACT_FROM    => 'lib/Module/Lazy.pm',
     LICENSE          => 'artistic_2',
     PL_FILES         => {},
     MIN_PERL_VERSION => '5.008',
@@ -21,17 +21,17 @@ WriteMakefile(
     PREREQ_PM => {
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'on-demand*' },
+    clean => { FILES => 'Module-Lazy*' },
     META_MERGE => {
         'meta-spec' => { version => 2 },
         resources   => {
             bugtracker => {
-                web => 'https://github.com/dallaylaen/on-demand-perl/issues',
+                web => 'https://github.com/dallaylaen/module-lazy-perl/issues',
             },
             repository => {
                 type => 'git',
-                url => 'https://github.com/dallaylaen/on-demand-perl.git',
-                web => 'https://github.com/dallaylaen/on-demand-perl',
+                url => 'https://github.com/dallaylaen/module-lazy-perl.git',
+                web => 'https://github.com/dallaylaen/module-lazy-perl',
             },
         },
         x_contributors => [

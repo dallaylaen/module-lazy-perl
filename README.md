@@ -1,18 +1,18 @@
-on-demand
+Module-Lazy
 
 # NAME
 
-on::demand - postpone loading a perl module until it's actually used
+Module::Lazy - postpone loading a perl module until it's actually used
 
 # USAGE
 
-    use on::demand "My::Module";
+    use Module::Lazy "My::Module";
     # the module is not required at this point, speeding up the startup
 
     my $new = My::Module->new;
     # My::Module is loaded now and real new() method is called
 
-    no on::demand;
+    no Module::Lazy;
     # Force loading of all postponed modules, in alphabetical order
 
 # DESCRIPTION
@@ -47,24 +47,24 @@ To install this module, run the following commands:
 After installing, you can find documentation for this module with the
 perldoc command.
 
-    perldoc on::demand
+    perldoc Module::Lazy
 
 You can also look for information at:
 
     Github:
-        https://github.com/dallaylaen/on-demand-perl
+        https://github.com/dallaylaen/module-lazy-perl
 
     RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=on-demand
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Module-Lazy
 
     AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/on-demand
+        http://annocpan.org/dist/Module-Lazy
 
     CPAN Ratings
-        http://cpanratings.perl.org/d/on-demand
+        http://cpanratings.perl.org/d/Module-Lazy
 
     Search CPAN
-        http://search.cpan.org/dist/on-demand/
+        http://search.cpan.org/dist/Module-Lazy/
 
 
 # LICENSE AND COPYRIGHT

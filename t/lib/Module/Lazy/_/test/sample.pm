@@ -1,4 +1,4 @@
-package on::demand::_::test::sample;
+package Module::Lazy::_::test::sample;
 
 use strict;
 use warnings;

@@ -5,14 +5,14 @@ use warnings;
 use Test::More;
 use Test::Exception;
 
-require on::demand; # no use!
+require Module::Lazy; # no use!
 
 throws_ok {
-    on::demand->import;
-} qr/[Uu]sage.*on::demand.*Module::Name/, "No empty usage";
+    Module::Lazy->import;
+} qr/[Uu]sage.*Module::Lazy.*Module::Name/, "No empty usage";
 
 throws_ok {
-    on::demand->import(foo => 42);
-} qr/[Uu]sage.*on::demand.*Module::Name/, "No extra arguments";
+    Module::Lazy->import(foo => 42);
+} qr/[Uu]sage.*Module::Lazy.*Module::Name/, "No extra arguments";
 
 done_testing;

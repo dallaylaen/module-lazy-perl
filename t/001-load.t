@@ -4,6 +4,6 @@ use strict;
 use warnings;
 use Test::More tests => 1;
 
-require_ok( 'on::demand' )
-    or print "Bail out! Failed to load on::demand";
+require_ok( 'Module::Lazy' )
+    or print "Bail out! Failed to load Module::Lazy";
 
