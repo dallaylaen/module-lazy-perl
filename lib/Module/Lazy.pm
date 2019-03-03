@@ -203,14 +203,16 @@ Konstantin S. Uvarin, C<< <khedin@cpan.org> >>
 
 =over
 
-=item * import() is not called on the modules being loaded.
+=item * C<use mro 'c3';> does not work with lazy-loaded parent classes.
+
+=item * C<import()> is not called on the modules being loaded.
 The decision is yet to be made whether it's good or bad.
 
 =item * no way to preload prototyped exported functions
 (that's what L<autouse> does),
 but maybe there should be?
 
-=item * certainly not enough interoperability tests (C<use mro 'c3'>?).
+=item * certainly not enough interoperability tests.
 
 =back
 
