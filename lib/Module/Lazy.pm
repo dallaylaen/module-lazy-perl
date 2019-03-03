@@ -62,6 +62,7 @@ No extra options (except from target module name) are allowed.
 
 =cut
 
+my $dont;
 my %seen;
 my $inc_stub = "pending load by ".__PACKAGE__;
 
@@ -76,7 +77,10 @@ sub import {
     my $mod = $target;
     $mod =~ s,::,/,g;
     $mod .= ".pm";
+
     return if $INC{$mod};
+    return _load( $target, $mod )
+        if $dont;
 
     croak "Bad module name '$target'"
         unless $target =~ /^[A-Za-z_][A-Za-z_0-9]*(?:::[A-Za-z_0-9]+)*$/;
@@ -123,14 +127,15 @@ sub unimport {
     croak "usage: no Module::Lazy;"
         if @_;
 
+    $dont++;
     # sort keys to ensure load order stability in case of bugs
     foreach (sort keys %seen) {
-        _load($_);
+        _inflate($_);
     };
 };
 
 my %known_method;
-sub _load {
+sub _inflate {
     my $target = shift;
 
     # TODO distinguish between "not seen" and "already loaded"
@@ -148,20 +153,25 @@ sub _load {
 
     # make the module loadable again
     delete $INC{$mod};
+    _load( $target, $mod );
+};
+
+sub _load {
+    my ($target, $mod) = @_;
 
     package
         Module::Lazy::_::quarantine;
 
     local $Carp::Internal{ __PACKAGE__ } = 1;
     require $mod;
-    # TODO maybe import()
+    # TODO maybe $target->import()
 };
 
 sub _jump {
     my ($target, $todo, $nodie) = @_;
 
     return sub {
-        _load( $target );
+        _inflate( $target );
 
         my $jump = $target->can($todo);
         goto $jump
@@ -195,8 +205,6 @@ Konstantin S. Uvarin, C<< <khedin@cpan.org> >>
 
 =item * import() is not called on the modules being loaded.
 The decision is yet to be made whether it's good or bad.
-
-=item * C<no Module::Lazy> should prevent further demand-loading.
 
 =item * no way to preload prototyped exported functions
 (that's what L<autouse> does),
