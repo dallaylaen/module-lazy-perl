@@ -69,8 +69,11 @@ my $inc_stub = "pending load by ".__PACKAGE__;
 sub import {
     my ($class, $target, @rest) = @_;
 
-    croak "Usage: use Module::Lazy 'Module::Name';"
-        unless defined $target and @rest == 0;
+    # bare use statement is ok
+    return unless defined $target;
+
+    croak "Usage: use Module::Lazy 'Module::Name'; extra options not supported"
+        unless @rest == 0;
 
     # return ASAP if already loaded by us or Perl itself
     return if $seen{$target};
