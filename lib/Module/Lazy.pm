@@ -95,7 +95,7 @@ sub import {
     # Preventing them from being loaded seems like a lesser evil.
     $INC{$mod} = $inc_stub;
 
-    _set_function( $target, AUTOLOAD => sub {
+    _set_symbol( $target, AUTOLOAD => sub {
         our $AUTOLOAD;
         $AUTOLOAD =~ s/.*:://;
         my $jump = _jump( $target, $AUTOLOAD );
@@ -104,11 +104,16 @@ sub import {
 
     # Provide DESTROY just in case someone blesses an object directly
     #     without ever loading a module
-    _set_function( $target, DESTROY => _jump( $target, DESTROY => "no_die" ) );
+    _set_symbol( $target, DESTROY => _jump( $target, DESTROY => "no_die" ) );
 
+    # If somebody calls Module->can("foo"), we can't really tell
+    # without loading, so override it
     foreach (qw( can isa )) {
-        _set_function( $target, $_ => _jump( $target, $_ ) );
+        _set_symbol( $target, $_ => _jump( $target, $_ ) );
     };
+
+    # Provide a fake version for `use My::Module 100.500`
+    _set_symbol( $target, VERSION => 10**9 );
 };
 
 =head2 unimport
@@ -137,7 +142,7 @@ sub unimport {
     };
 };
 
-my %known_method;
+my %cleanup_symbol;
 sub _inflate {
     my $target = shift;
 
@@ -150,9 +155,12 @@ sub _inflate {
         unless $INC{$mod} and $INC{$mod} eq $inc_stub;
 
     # reset stub methods prior to loading
-    foreach (keys %{ $known_method{$target} || {} }) {
-        _set_function( $target, $_ => undef );
+    foreach (keys %{ $cleanup_symbol{$target} || {} }) {
+        _unset_symbol( $target, $_ );
     };
+
+    # reset fake $VERSION
+    _set_symbol( $target, VERSION => undef );
 
     # make the module loadable again
     delete $INC{$mod};
@@ -185,17 +193,31 @@ sub _jump {
     };
 };
 
-sub _set_function {
-    my ($target, $name, $code) = @_;
+sub _set_symbol {
+    my ($target, $name, $ref) = @_;
 
-    if (ref $code) {
-        $known_method{$target}{$name}++;
+    if (ref $ref) {
+        # really update symbol table
+        $cleanup_symbol{$target}{$name}++;
         no strict 'refs'; ## no critic
-        *{ $target."::".$name } = $code;
+        *{ $target."::".$name } = $ref;
     } else {
+        # just set scalar
         no strict 'refs'; ## no critic
-        delete ${ $target."::" }{ $name };
+        ${ $target.'::'.$name } = $ref;
     };
+};
+
+sub _unset_symbol {
+    my ($target, $name) = @_;
+
+    no strict 'refs'; ## no critic
+    # because package scalars are _special_,
+    # move SCALAR ref around the destruction
+    # just in case someone referenced it before module was loaded
+    my $save = \${ $target."::".$name };
+    delete ${ $target."::" }{ $name };
+    *{ $target.'::'.$name } = $save;
 };
 
 =head1 AUTHOR
