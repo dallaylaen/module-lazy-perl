@@ -220,9 +220,25 @@ sub _unset_symbol {
     *{ $target.'::'.$name } = $save;
 };
 
-=head1 AUTHOR
+=head1 CAVEATS
 
-Konstantin S. Uvarin, C<< <khedin@cpan.org> >>
+=over
+
+=item * The following symbols are currently replaced by stubs
+in the module to be loaded: C<AUTOLOAD>, C<DESTROY>, C<can>, C<isa>.
+
+=item * If a module was ever lazyloaded, a normal C<require> would do nothing.
+A method must be called to inflate the module.
+
+This is done so because a normal require would partially overwrite
+stub methods and potentially wreak havoc.
+
+=item * A fake $VERSION = 10**9 is generated so that C<use Module x.yy>
+doesn't die. This value is erased before actually loading the module.
+
+=back
+
+
 
 =head1 BUGS
 
@@ -292,7 +308,7 @@ it does it for imported functions rather than methods.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019 Konstantin S. Uvarin.
+Copyright 2019 Konstantin S. Uvarin, C<< <khedin@cpan.org> >>
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
