@@ -288,7 +288,7 @@ Please report bugs via github or RT:
 
 =item * L<https://github.com/dallaylaen/module-lazy-perl/issues>
 
-=item * C<bug-assert-refute-t-deep at rt.cpan.org>
+=item * C<bug-module-lazy at rt.cpan.org>
 
 =item * L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Module-Lazy>
 
