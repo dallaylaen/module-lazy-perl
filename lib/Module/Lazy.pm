@@ -42,7 +42,7 @@ None.
 =cut
 
 use Carp;
-use constant DEBUG => $ENV{PERL_DEBUG_LAZYLOAD};
+use constant DEBUG => $ENV{PERL_LAZYLOAD_DEBUG};
 
 =head2 import
 
@@ -63,7 +63,7 @@ No extra options (except from target module name) are allowed.
 
 =cut
 
-my $dont;
+my $dont = $ENV{PERL_LAZYLOAD_DISABLE};
 my %seen;
 my $inc_stub = "pending load by ".__PACKAGE__;
 
@@ -237,8 +237,13 @@ sub _unset_symbol {
 
 =head1 ENVIRONMENT
 
-If C<PERL_DEBUG_LAZYLOAD> is set and true,
+If C<PERL_LAZYLOAD_DEBUG> is set and true,
 warns about module loading via Carp.
+
+If C<PERL_LAZYLOAD_DISABLE> is set and true,
+don't try to lazyload anything - just go straight to C<require>.
+
+(That's roughly equivalent to C<perl -M-Module::Lazy> on command line).
 
 =head1 CAVEATS
 
