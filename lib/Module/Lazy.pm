@@ -42,7 +42,7 @@ None.
 =cut
 
 use Carp;
-use constant DEBUG => $ENV{PERL_LAZYLOAD_DEBUG};
+use constant DEBUG => !!$ENV{PERL_LAZYLOAD_DEBUG};
 
 =head2 import
 
@@ -63,7 +63,7 @@ No extra options (except from target module name) are allowed.
 
 =cut
 
-my $dont = $ENV{PERL_LAZYLOAD_DISABLE};
+my $dont = !!$ENV{PERL_LAZYLOAD_DISABLE};
 my %seen;
 my $inc_stub = "pending load by ".__PACKAGE__;
 
