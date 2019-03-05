@@ -42,6 +42,7 @@ None.
 =cut
 
 use Carp;
+use constant DEBUG => $ENV{PERL_DEBUG_LAZYLOAD};
 
 =head2 import
 
@@ -82,6 +83,10 @@ sub import {
     $mod .= ".pm";
 
     return if $INC{$mod};
+
+    carp __PACKAGE__.": request to load $target "
+        .($seen{$target} ? '(seen)' : '(first time)')
+            if DEBUG;
     return _load( $target, $mod )
         if $dont;
 
@@ -135,6 +140,9 @@ sub unimport {
     croak "usage: no Module::Lazy;"
         if @_;
 
+    carp __PACKAGE__.": unimport called"
+        if DEBUG;
+
     $dont++;
     # sort keys to ensure load order stability in case of bugs
     foreach (sort keys %seen) {
@@ -169,6 +177,9 @@ sub _inflate {
 
 sub _load {
     my ($target, $mod) = @_;
+
+    carp __PACKAGE__.": loading $target from $mod"
+        if DEBUG;
 
     package
         Module::Lazy::_::quarantine;
@@ -219,6 +230,11 @@ sub _unset_symbol {
     delete ${ $target."::" }{ $name };
     *{ $target.'::'.$name } = $save;
 };
+
+=head1 ENVIRONMENT
+
+If C<PERL_DEBUG_LAZYLOAD> is set and true,
+warns about module loading via Carp.
 
 =head1 CAVEATS
 
