@@ -4,6 +4,13 @@ use strict;
 use warnings;
 use Test::More;
 
+BEGIN {
+    if (!eval { require mro; 1 }) {
+        plan skip_all => "no 'mro' found, skipping";
+        exit 0;
+    };
+};
+
 use FindBin qw($Bin);
 use lib "$Bin/lib";
 
