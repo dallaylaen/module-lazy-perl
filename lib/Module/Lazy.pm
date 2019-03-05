@@ -146,7 +146,8 @@ sub unimport {
     $dont++;
     # sort keys to ensure load order stability in case of bugs
     foreach (sort keys %seen) {
-        _inflate($_);
+        # some modules may have been already loaded, skip if so
+        _inflate($_) if $seen{$_};
     };
 };
 
@@ -156,11 +157,14 @@ sub _inflate {
 
     # TODO distinguish between "not seen" and "already loaded"
     my $mod = delete $seen{$target};
-    croak "Module '$target' was never loaded via Module::Lazy, that's possibly a bug"
+    croak "Module '$target' is unknown Module::Lazy, or already loaded. Please file a bug"
         unless $mod;
 
-    croak "Module '$target' already loaded from '$INC{$mod}'"
-        unless $INC{$mod} and $INC{$mod} eq $inc_stub;
+    carp "Module '$target' wasn't preloaded by Module::Lazy. Please file a bug"
+        unless $INC{$mod};
+
+    return carp "Module '$target' already loaded elsewhere from '$INC{$mod}'"
+        unless $INC{$mod} eq $inc_stub;
 
     # reset stub methods prior to loading
     foreach (keys %{ $cleanup_symbol{$target} || {} }) {
